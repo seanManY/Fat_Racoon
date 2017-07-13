@@ -1051,6 +1051,6 @@ MonoBehaviour:
   gridOffsetY: 0
   gridOffsetX: 0
   selectedColor: {r: 0.33823532, g: 0.33326128, b: 0.33326128, a: 1}
-  tool: 0
+  tool: 1
   gridBGIndex: 0
   dirty: 0
