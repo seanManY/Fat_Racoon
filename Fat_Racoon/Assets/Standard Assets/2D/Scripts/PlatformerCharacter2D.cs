@@ -23,6 +23,12 @@ namespace UnitySampleAssets._2D
         private float ceilingRadius = .01f; // Radius of the overlap circle to determine if the player can stand up
         private Animator anim; // Reference to the player's animator component.
 
+        //my stuff
+        private bool  isClimbing = false;
+        public float  climbSpeed;
+        private float climbVelocity;
+        private float gravityStore;
+
 
         private void Awake()
         {
@@ -30,6 +36,8 @@ namespace UnitySampleAssets._2D
             groundCheck = transform.Find("GroundCheck");
             ceilingCheck = transform.Find("CeilingCheck");
             anim = GetComponent<Animator>();
+
+            gravityStore = this.gameObject.GetComponent<Rigidbody2D>().gravityScale;
         }
 
 
@@ -41,6 +49,7 @@ namespace UnitySampleAssets._2D
 
             // Set the vertical animation
             anim.SetFloat("vSpeed", GetComponent<Rigidbody2D>().velocity.y);
+
             
         }
 
@@ -89,6 +98,9 @@ namespace UnitySampleAssets._2D
                 anim.SetBool("Ground", false);
                 GetComponent<Rigidbody2D>().AddForce(new Vector2(0f, jumpForce));
             }
+
+            UpdateClimb();
+            
         }
 
 
@@ -101,6 +113,59 @@ namespace UnitySampleAssets._2D
             Vector3 theScale = transform.localScale;
             theScale.x *= -1;
             transform.localScale = theScale;
+        }
+
+        void OnTriggerEnter2D(Collider2D other)
+        {
+            if(other.gameObject.tag == "Climbable")
+            {
+                isClimbing = true;
+                Debug.Log(isClimbing);
+            }
+        }
+
+        void OnTriggerExit2D(Collider2D other)
+        {
+            if(other.gameObject.tag == "Climbable")
+            {
+                isClimbing = false;
+                Debug.Log(isClimbing);
+            }
+        }
+
+        void UpdateClimb()
+        {
+
+            if(isClimbing)
+            {
+                this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 0f;
+
+                climbVelocity = climbSpeed * Input.GetAxisRaw("Vertical");
+
+                this.gameObject.GetComponent<Rigidbody2D>().velocity =
+                    new Vector2(this.gameObject.GetComponent<Rigidbody2D>().velocity.x, climbVelocity);
+
+                //this.gameObject.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePositionX;
+            }
+
+            if(!isClimbing)
+            {
+                this.gameObject.GetComponent<Rigidbody2D>().gravityScale = gravityStore;
+            }
+            //if(isClimbing)
+            //{
+            //    if(Input.GetAxis("Vertical") > 0)
+            //    {
+            //        this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 0;
+
+            //        transform.Translate(0, 1 * Time.deltaTime, 0);
+            //    }
+            //    else if (Input.GetAxis("Vertical") < 0)
+            //    {
+            //        this.gameObject.GetComponent<Rigidbody2D>().gravityScale = 0;
+            //        transform.Translate(0, -1 * Time.deltaTime, 0);
+            //    }
+            //}
         }
     }
 }
